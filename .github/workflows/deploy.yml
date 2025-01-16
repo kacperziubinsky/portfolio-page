@@ -30,9 +30,9 @@ jobs:
 
       # Krok 5: Wgrywanie plików na serwer FTP
       - name: Deploy to FTP server
-        uses: SamKirkland/FTP-Deploy-Action@v5
+        uses: SamKirkland/FTP-Deploy-Action@v4  # Użycie wersji v4
         with:
-          ftp-server: ftp://ziubinski.pl  
+          ftp-server: ftp://ziubinski.pl  # Zmienna z adresem FTP
           ftp-username: ${{ secrets.FTP_USERNAME }}  # Użycie sekretu
           ftp-password: ${{ secrets.FTP_PASSWORD }}  # Użycie sekretu
           local-dir: ./build  # Ścieżka do katalogu build w aplikacji React
