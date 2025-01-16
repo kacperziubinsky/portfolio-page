@@ -32,7 +32,7 @@ jobs:
       - name: Deploy to FTP server
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5  # Użycie wersji v4
         with:
-          server: ftp://ziubinski.pl            # Poprawiony klucz
+          server: ftp://ziubinski.pl:21            # Poprawiony klucz
           username: ${{ secrets.FTP_USERNAME }} # Poprawiony klucz
           password: ${{ secrets.FTP_PASSWORD }} # Poprawiony klucz
           local-dir: ./dist/                     # Katalog z plikami do przesłania
