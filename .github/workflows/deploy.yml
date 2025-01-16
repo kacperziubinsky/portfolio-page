@@ -1,0 +1,39 @@
+name: Deploy to FTP
+
+on:
+  push:
+    branches:
+      - main  # lub master, zależnie od nazwy Twojej głównej gałęzi
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Krok 1: Checkout kodu
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Krok 2: Instalacja Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'  # Wersja Node.js, którą używasz w projekcie
+
+      # Krok 3: Instalacja zależności
+      - name: Install dependencies
+        run: npm install
+
+      # Krok 4: Budowanie aplikacji React
+      - name: Build React app
+        run: npm run build
+
+      # Krok 5: Wgrywanie plików na serwer FTP
+      - name: Deploy to FTP server
+        uses: SamKirkland/FTP-Deploy-Action@v5
+        with:
+          ftp-server: ftp://ziubinski.pl  
+          ftp-username: ${{ secrets.FTP_USERNAME }}  # Użycie sekretu
+          ftp-password: ${{ secrets.FTP_PASSWORD }}  # Użycie sekretu
+          local-dir: ./build  # Ścieżka do katalogu build w aplikacji React
+          remote-dir: /public_html  # Ścieżka na serwerze FTP
