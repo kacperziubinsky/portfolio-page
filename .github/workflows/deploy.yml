@@ -36,8 +36,4 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }} # Poprawiony klucz
           password: ${{ secrets.FTP_PASSWORD }} # Poprawiony klucz
           local-dir: ./dist/                     # Katalog z plikami do przesłania
-<<<<<<< HEAD
           server-dir: /public_html/              # Katalog docelowy na serwerze FTP
-=======
-          server-dir: /public_html/              # Katalog docelowy na serwerze FTP
->>>>>>> 3d89a231297d24b98d8d80e88b27193a0dac9231
