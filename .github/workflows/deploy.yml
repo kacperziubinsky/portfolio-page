@@ -24,16 +24,16 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # Krok 4: Budowanie aplikacji React
-      - name: Build React app
+      # Krok 4: Budowanie aplikacji Vite
+      - name: Build Vite app
         run: npm run build
 
       # Krok 5: Wgrywanie plików na serwer FTP
       - name: Deploy to FTP server
         uses: SamKirkland/FTP-Deploy-Action@v4  # Użycie wersji v4
         with:
-          ftp-server: ftp://ziubinski.pl  # Zmienna z adresem FTP
+          ftp-server: ftp://ziubinski.pl # Zmienna z adresem FTP
           ftp-username: ${{ secrets.FTP_USERNAME }}  # Użycie sekretu
           ftp-password: ${{ secrets.FTP_PASSWORD }}  # Użycie sekretu
-          local-dir: ./build  # Ścieżka do katalogu build w aplikacji React
+          local-dir: ./dist  # Vite generuje pliki w folderze 'dist'
           remote-dir: /public_html  # Ścieżka na serwerze FTP
