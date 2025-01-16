@@ -32,8 +32,8 @@ jobs:
       - name: Deploy to FTP server
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5  # Użycie wersji v4
         with:
-          ftp-server: ftp://ziubinski.pl # Zmienna z adresem FTP
-          ftp-username: ${{ secrets.FTP_USERNAME }}  # Użycie sekretu
-          ftp-password: ${{ secrets.FTP_PASSWORD }}  # Użycie sekretu
-          local-dir: ./dist  # Vite generuje pliki w folderze 'dist'
-          remote-dir: /public_html  # Ścieżka na serwerze FTP
+          server: ftp://ziubinski.pl            # Poprawiony klucz
+          username: ${{ secrets.FTP_USERNAME }} # Poprawiony klucz
+          password: ${{ secrets.FTP_PASSWORD }} # Poprawiony klucz
+          local-dir: ./dist                     # Katalog z plikami do przesłania
+          server-dir: /public_html              # Katalog docelowy na serwerze FTP
