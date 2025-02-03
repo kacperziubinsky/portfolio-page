@@ -11,26 +11,28 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up SSH and Deploy
+      - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          port: 22
           script: |
-            # Navigate to your project directory
-            cd /path/to/your/project
-
+            # Change to your actual project directory
+            cd /opt/docker_image/
+            
             # Pull the latest code
             git pull origin main
-
-            # Build the Docker image
+            
+            # Build Docker image
             docker build -t my-app .
-
-            # Stop and remove existing container if it exists
+            
+            # Stop existing container if it exists
             docker stop my-app || true
             docker rm my-app || true
-
+            
             # Run new container
             docker run -d \
               -p 8080:80 \
