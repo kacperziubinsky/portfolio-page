@@ -17,22 +17,16 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
+          debug: true
           script: |
-            # Change to your actual project directory
+            pwd
+            whoami
             cd /opt/docker_image/
-            
-            # Pull the latest code
+            ls -la
             git pull origin main
-            
-            # Build Docker image
             docker build -t my-app .
-            
-            # Stop existing container if it exists
             docker stop my-app || true
             docker rm my-app || true
-            
-            # Run new container
             docker run -d \
               -p 8080:80 \
               --name my-app \
