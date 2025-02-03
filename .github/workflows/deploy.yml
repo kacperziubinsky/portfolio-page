@@ -1,49 +1,27 @@
-name: CI/CD Pipeline
+name: Deploy to VPS
 
 on:
   push:
     branches:
-      - main    # Zmieniaj na swoją gałąź, np. master
-  pull_request:
-    branches:
-      - main    # Zmieniaj na swoją gałąź, np. master
+      - main  # Zmienna: używaj swojej głównej gałęzi
 
 jobs:
-  build_and_deploy:
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
-      # Pobranie kodu z repozytorium
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # Instalacja Docker
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      # Budowanie obrazu Docker
-      - name: Build Docker image
-        run: |
-          docker build -t my-app:${{ github.sha }} .
-
-      # Zalogowanie się do serwera (SSH)
-      - name: SSH to the server
+      - name: Set up SSH
         uses: appleboy/ssh-action@v0.1.0
         with:
-          host: ${{ secrets.SERVER_IP }}       # Adres IP serwera
-          username: ${{ secrets.SERVER_USER }}  # Nazwa użytkownika na serwerze
-          key: ${{ secrets.SSH_PRIVATE_KEY }}   # Klucz prywatny SSH do serwera
-          port: 22                             # Port SSH (domyślnie 22)
+          host: ${{ secrets.VPS_HOST }}  # Adres IP VPS lub hostname
+          username: ${{ secrets.VPS_USER }}  # Nazwa użytkownika na VPS
+          key: ${{ secrets.SSH_PRIVATE_KEY }}  # Klucz prywatny SSH dodany w sekcjach Secrets
+          port: 22
           script: |
-            # Zatrzymanie bieżącego kontenera (jeśli istnieje)
+            # Komendy do uruchomienia na VPS
             docker stop my-app || true
             docker rm my-app || true
-
-            # Usunięcie starego obrazu
-            docker rmi my-app || true
-
-            # Pobranie nowego obrazu
-            docker pull my-app:${{ github.sha }} || true
-
-            # Uruchomienie nowego kontenera
-            docker run -d -p 8080:80 --name my-app my-app:${{ github.sha }}
+            docker pull my-app:latest || true
+            docker run -d -p 8080:80 --name my-app my-app:latest
