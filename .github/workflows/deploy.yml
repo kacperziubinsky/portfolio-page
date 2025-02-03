@@ -36,5 +36,21 @@ jobs:
             # Budowanie obrazu na VPS
             docker build -t react-app /path/to/repo
 
+<<<<<<< HEAD
             # Uruchomienie nowego kontenera
             docker run -d --name react_app -p 80:80 react-app
+=======
+      # Krok 4: Budowanie aplikacji Vite
+      - name: Build Vite app
+        run: npm run build
+
+      # Krok 5: Wgrywanie plików na serwer FTP
+      - name: Deploy to FTP server
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5  # Użycie wersji v4
+        with:
+          server: ziubinski.pl          # Poprawiony klucz
+          username: ${{ secrets.FTP_USERNAME }} # Poprawiony klucz
+          password: ${{ secrets.FTP_PASSWORD }} # Poprawiony klucz
+          local-dir: ./dist/                     # Katalog z plikami do przesłania
+          server-dir: /public_html/              # Katalog docelowy na serwerze FTP
+>>>>>>> 125ce72d4a1224f23340b12188f323ef2db2a3eb
