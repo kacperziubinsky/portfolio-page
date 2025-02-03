@@ -1,55 +1,49 @@
-name: Deploy React App
+name: CI/CD Pipeline
 
 on:
   push:
     branches:
-      - main
+      - main    # Zmieniaj na swoją gałąź, np. master
+  pull_request:
+    branches:
+      - main    # Zmieniaj na swoją gałąź, np. master
 
 jobs:
-  build:
+  build_and_deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Pobranie repozytorium
-        uses: actions/checkout@v3
+      # Pobranie kodu z repozytorium
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-      - name: Budowanie obrazu Dockera
+      # Instalacja Docker
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      # Budowanie obrazu Docker
+      - name: Build Docker image
         run: |
-          docker build -t react-app .
+          docker build -t my-app:${{ github.sha }} .
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Połączenie SSH i wdrożenie na VPS
-        uses: appleboy/ssh-action@master
+      # Zalogowanie się do serwera (SSH)
+      - name: SSH to the server
+        uses: appleboy/ssh-action@v0.1.0
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: ${{ secrets.SERVER_IP }}       # Adres IP serwera
+          username: ${{ secrets.SERVER_USER }}  # Nazwa użytkownika na serwerze
+          key: ${{ secrets.SSH_PRIVATE_KEY }}   # Klucz prywatny SSH do serwera
+          port: 22                             # Port SSH (domyślnie 22)
           script: |
-            # Zatrzymanie i usunięcie starego kontenera
-            docker stop react_app || true
-            docker rm react_app || true
+            # Zatrzymanie bieżącego kontenera (jeśli istnieje)
+            docker stop my-app || true
+            docker rm my-app || true
 
-            # Budowanie obrazu na VPS
-            docker build -t react-app /path/to/repo
+            # Usunięcie starego obrazu
+            docker rmi my-app || true
+
+            # Pobranie nowego obrazu
+            docker pull my-app:${{ github.sha }} || true
 
             # Uruchomienie nowego kontenera
-            docker run -d --name react_app -p 80:80 react-app
-
-      # Krok 4: Budowanie aplikacji Vite
-      - name: Build Vite app
-        run: npm run build
-
-      # Krok 5: Wgrywanie plików na serwer FTP
-      - name: Deploy to FTP server
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5  # Użycie wersji v4
-        with:
-          server: ziubinski.pl          # Poprawiony klucz
-          username: ${{ secrets.FTP_USERNAME }} # Poprawiony klucz
-          password: ${{ secrets.FTP_PASSWORD }} # Poprawiony klucz
-          local-dir: ./dist/                     # Katalog z plikami do przesłania
-          server-dir: /public_html/              # Katalog docelowy na serwerze FTP
-
+            docker run -d -p 8080:80 --name my-app my-app:${{ github.sha }}
