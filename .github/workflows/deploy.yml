@@ -19,6 +19,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}  # Nazwa użytkownika na VPS
           key: ${{ secrets.SSH_PRIVATE_KEY }}  # Klucz prywatny SSH dodany w sekcjach Secrets
           port: 22
+          debug: true 
           script: |
             # Komendy do uruchomienia na VPS
             docker stop my-app || true
