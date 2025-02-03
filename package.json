@@ -5,7 +5,7 @@
   "homepage": "https://github.com/kacperziubinsky/portfolio-page",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host --port 2137",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
     "build": "vite build",

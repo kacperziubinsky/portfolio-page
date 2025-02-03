@@ -1,43 +1,40 @@
-name: Deploy to FTP
+name: Deploy React App
 
 on:
   push:
     branches:
-      - main  # lub master, zależnie od nazwy Twojej głównej gałęzi
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # Krok 1: Checkout kodu
-      - name: Checkout code
+      - name: Pobranie repozytorium
         uses: actions/checkout@v3
 
-      # Krok 2: Instalacja Node.js
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Budowanie obrazu Dockera
+        run: |
+          docker build -t react-app .
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Połączenie SSH i wdrożenie na VPS
+        uses: appleboy/ssh-action@master
         with:
-          node-version: '16'  # Wersja Node.js, którą używasz w projekcie
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Zatrzymanie i usunięcie starego kontenera
+            docker stop react_app || true
+            docker rm react_app || true
 
-      # Krok 3: Instalacja zależności
-      - name: Install dependencies
-        run: npm install
+            # Budowanie obrazu na VPS
+            docker build -t react-app /path/to/repo
 
-      # Krok 4: Budowanie aplikacji Vite
-      - name: Build Vite app
-        run: npm run build
-
-      # Krok 5: Wgrywanie plików na serwer FTP
-      - name: Deploy to FTP server
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5  # Użycie wersji v4
-        with:
-          server: ziubinski.pl          # Poprawiony klucz
-          username: ${{ secrets.FTP_USERNAME }} # Poprawiony klucz
-          password: ${{ secrets.FTP_PASSWORD }} # Poprawiony klucz
-          local-dir: ./dist/                     # Katalog z plikami do przesłania
-<<<<<<< HEAD
-          server-dir: /public_html/              # Katalog docelowy na serwerze FTP
-=======
-          server-dir: /public_html/              # Katalog docelowy na serwerze FTP
->>>>>>> 3d89a231297d24b98d8d80e88b27193a0dac9231
+            # Uruchomienie nowego kontenera
+            docker run -d --name react_app -p 80:80 react-app
